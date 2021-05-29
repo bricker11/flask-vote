@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>网上投票管理系统</title>
+    <link rel="icon" href="{{ url_for('static',filename='img/favicon.ico') }}" type="image/x-icon">
+    <link rel="stylesheet" href="{{ url_for('static',filename='layui/css/layui.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static',filename='style.css') }}">
+    <script type="text/javascript" src="{{ url_for('static',filename='layui/layui.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static',filename='echart/echarts.js') }}"></script>
+</head>
+<body class="layui-layout-body">
+    <div class="layui-layout layui-layout-admin">
+        <!-- 页面头部 -->
+        <div class="layui-header" style="background: #134556">
+            <div class="layui-logo layui-layout-left">
+                <a href="{{ url_for('auth.admin') }}">
+                   <div class="layui-row">
+                       <div class="layui-row layui-col-md3" style="text-align: right"><img src="{{ url_for('static',filename='img/logo.png') }}" style="height: 20px;width: 20px;"></div>
+                       <div class="layui-row layui-col-md9"><h3 style="font-size:16px;color: #e6e6e6">网上投票管理系统</h3></div>
+                   </div>
+                </a>
+            </div>
+            <ul class="layui-nav layui-layout-right">
+                <li class="layui-nav-item">
+                    <p>欢迎您 </p>
+                </li>
+                <li class="layui-nav-item">
+                    <a href="#"><p>{{ username }}</p></a>
+                    <dl class="layui-nav-child">
+                        <a href="{{ url_for('auth.usermanage') }}">个人信息</a>
+                        <a href="{{ url_for('auth.usermanage') }}">修改密码</a>
+                    </dl>
+                </li>
+                <li class="layui-nav-item">
+                    <a href="{{ url_for('main.logout') }}">退出</a>
+                </li>
+            </ul>
+        </div>
+        <!-- 侧边导航栏 -->
+        <div class="layui-side">
+            <div class="layui-side-scroll" style="background: #333">
+                <ul class="layui-nav layui-nav-tree" style="background: #333">
+                    <li class="layui-nav-item">
+                        <a href="{{ url_for("auth.usermanage") }}">&nbsp&nbsp&nbsp&nbsp&nbsp<i class="layui-icon layui-icon-user"></i>&nbsp账号管理</a>
+                    </li>
+                    <li class="layui-nav-item">
+                        <a href="{{ url_for("auth.infomanage") }}">&nbsp&nbsp&nbsp&nbsp&nbsp<i class="layui-icon layui-icon-list"></i>&nbsp信息管理</a>
+                    </li>
+                    <li class="layui-nav-item">
+                        <a href="{{ url_for("auth.voteadd") }}">&nbsp&nbsp&nbsp&nbsp&nbsp<i class="layui-icon layui-icon-list"></i>&nbsp发布投票</a>
+                    </li>
+                    <li class="layui-nav-item">
+                        <a href="{{ url_for("auth.votemanage") }}">&nbsp&nbsp&nbsp&nbsp&nbsp<i class="layui-icon layui-icon-list"></i>&nbsp投票列表</a>
+                    </li>
+                    <li class="layui-nav-item">
+                        <a href="{{ url_for("auth.voteanalys") }}">&nbsp&nbsp&nbsp&nbsp&nbsp<i class="layui-icon layui-icon-chart"></i>&nbsp投票分析</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <!-- 主体内容 -->
+        <div class="layui-body">
+            <div class="layui-card-header">
+                <h2>{% block card_header %}{% endblock %}</h2>
+            </div>
+            <div class="layui-fluid">
+                <div class="layui-card-body">
+                    {% block card_body %}
+                    {% endblock %}
+                </div>
+            </div>
+        </div>
+        <!-- 页面底部 -->
+        <div class="layui-footer" style="text-align: center">
+            <p>Copyright 2021 Vote Management System</p>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static',filename='layui/layui.all.js') }}"></script>
+    <script src="{{ url_for('static',filename='jquery/jquery.min.js') }}"></script>
+
+    <script>
+        layui.use('element',function (){
+            var element = layui.element;
+        })
+    </script>
+
+    {% block script %}
+    {% endblock %}
+
+    {% block outest %}
+    {% endblock %}
+
+</body>
+</html>

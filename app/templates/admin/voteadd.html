@@ -1,0 +1,100 @@
+{% extends "admin/base.html" %}
+
+{% block card_header %}
+    发布投票
+{% endblock %}
+
+{% block card_body %}
+<div class="add-vote">
+    <form class="layui-form" method="post">
+        <!-- 必须添加 form.csrf_token ,否则表单验证不通过 -->
+        {{ form.csrf_token }}
+        <!-- 必须添加 form.csrf_token ,否则表单验证不通过 -->
+        <div class="layui-form-item">
+            <label class="layui-form-label">主题：</label>
+            <div class="layui-input-inline">
+                {{ form.title(class="layui-input",placeholder="",autocomplete="on") }}
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">内容：</label>
+            <div class="layui-input-inline">
+                {{ form.content(class="layui-textarea",placeholder="",autocomplete="on") }}
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">全部选项数：</label>
+            <div class="layui-input-inline">
+                {{ form.total_choice(class="layui-input",placeholder="",autocomplete="on") }}
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">可选选项数：</label>
+            <div class="layui-input-inline">
+                {{ form.max_choice(class="layui-input",placeholder="",autocomplete="on") }}
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">截止时间：</label>
+            <div class="layui-input-inline">
+                {{ form.end_time(class="layui-input",id="enddate") }}
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">添加选项：</label>
+            <div class="layui-input-inline">
+                <input class="layui-input" type="text" placeholder="请输入选项" id="choiceinput">
+            </div>
+            <div class="layui-input-inline">
+                <button class="layui-btn layui-btn-normal" type="button" id="addchoice">添加</button>
+            </div>
+        </div>
+        <div id="newchoices" style="margin: 10px 150px">
+
+        </div>
+        <div class="layui-input-inline add-vote-btn">
+            {{ form.submit(class="layui-btn",id="addsubmit") }}
+        </div>
+        <div class="layui-input-inline">
+            <input type="text" name="choices" value="" hidden id="subchoices">
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+
+{% block script %}
+<script>
+    layui.use('layer',function (){
+        var layer = layui.layer;
+        {% for message in get_flashed_messages() %}
+            layer.msg('{{ message }}');
+        {% endfor %}
+    })
+    layui.use('laydate', function(){
+        var laydate = layui.laydate;
+
+        //执行一个laydate实例
+        laydate.render({
+            elem: '#enddate', //指定元素
+            type: 'datetime'
+        });
+    });
+</script>
+
+<script>
+    var choices = '';
+    var index = 1;
+    $("#addchoice").on('click',function (){
+        if($("#choiceinput").val() != '')
+        {
+            choices = choices + $("#choiceinput").val() + '^';
+            console.log(choices);
+            $("#newchoices").append('<p>' + '选项' + index.toString() + ': ' + $("#choiceinput").val() + '</p>')
+            $("#subchoices").val(choices);
+            $("#choiceinput").val('');
+            index++;
+        }
+    })
+</script>
+{% endblock %}

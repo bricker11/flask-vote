@@ -1,0 +1,63 @@
+/****************************** 登陆注册样式 *******************************/
+.login-main {
+    text-align: center;
+    margin-top: 150px;
+}
+
+/* 登陆标题 */
+.login-main header {
+    margin: 30px;
+    font-size: 28px;
+}
+
+/* 行样式*/
+.login-main .layui-form .layui-input-block {
+    margin-left: 40%;
+    margin-right: 40%;
+}
+
+/* 登陆按键 */
+.login-main .layui-form .layui-input-block .layui-btn {
+    padding: 0 100px;
+    background-color: #22a2b6;
+}
+
+/* 角色选项 */
+.login-main .layui-form .layui-input-block .layui-form-radio {
+    color: #22a2b6;
+}
+
+.login-main .layui-form .layui-input-block .layui-form-radio .layui-icon {
+    color: #22a2b6;
+}
+
+/* 登陆分割线 */
+.login-main .layui-form hr {
+    margin-left: 40%;
+    margin-right: 40%;
+}
+
+/* 登陆底部 */
+.login-main .layui-form .login-footer {
+    margin: 0 45px;
+}
+
+/* 登陆底部 */
+.login-main .layui-form .register-footer {
+
+}
+
+/******************************* 管理员样式 ********************************/
+/* 发布投票页面样式 */
+.add-vote .layui-form-label {
+    width: 120px;
+}
+
+.add-vote .layui-input-inline {
+    width: 400px;
+}
+
+.add-vote .add-vote-btn {
+    margin-left: 150px;
+    text-align: center;
+}

@@ -1,0 +1,193 @@
+{% extends "user/base.html" %}
+
+{% block card_header %}
+    我的投票
+{% endblock %}
+
+{% block card_body %}
+    <!-- 搜索区域 -->
+    <div class="layui-row">
+        <div class="layui-row layui-col-md6">
+            <form class="layui-form" method="post" id="searchform">
+                <div class="layui-row">
+                <div class="layui-row layui-col-md6">
+                    <label class="layui-form-label">筛选条件：</label>
+                    <div class="layui-input-block">
+                        {{ form.option }}
+                    </div>
+                </div>
+
+                <div class="layui-row layui-col-md6">
+                    <label class="layui-form-label">关键词：</label>
+                    <div class="layui-input-block">
+                      {{ form.key(class="layui-input",placeholder="请输入关键词") }}
+                    </div>
+                </div>
+
+            </div>
+            </form>
+        </div>
+        <div class="layui-row layui-col-md6">
+            <div class="layui-input-block" style="margin-left: 20px">
+              <button class="layui-btn" lay-submit lay-filter="formDemo">
+                  <i class="layui-icon layui-icon-search layuiadmin-button-btn" id="search"></i>
+              </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 数据表格区域 -->
+    <div style="margin-top: 20px">
+        <table id="votelist" lay-filter="votelist"></table>
+    </div>
+
+    <!-- 表格内嵌按钮 -->
+    <div class="optionbtn" hidden>
+        <button type="button" class="layui-btn layui-btn-xs layui-btn-danger detailbtn">
+        详情
+        </button>
+    </div>
+
+{% endblock %}
+
+
+{% block script %}
+<script>
+    layui.use('layer',function (){
+        var layer = layui.layer;
+        {% for message in get_flashed_messages() %}
+            layer.msg('{{ message }}');
+        {% endfor %}
+    })
+
+    layui.use('form',function (){
+        var form = layui.form;
+    })
+
+    layui.use('table', function(){
+        var table = layui.table;
+        <!-- 表格渲染 -->
+        table.render({
+            elem: '#votelist'
+            ,height: 500
+            ,url: '{{ url_for('auth.api_user_myvote') }}' //数据接口
+            ,loading: true
+            ,cols: [[ //表头
+            {field: 'sno', title: '序号', width:50, align: 'center'}
+            ,{field: 'title', title: '主题', width:180, align:'center'}
+            ,{field: 'content', title: '内容', width:180, align:'center'}
+            ,{field: 'choices', title: '选项', width:180,  align:'center'}
+            ,{field: 'total', title: '所有选项', width:90, align:'center'}
+            ,{field: 'max', title: '可选选项', width:90, align:'center'}
+            ,{field: 'start_time', title: '发起时间', width:160, align:'center'}
+            ,{field: 'end_time', title: '截止时间', width:160, align:'center'}
+            ,{field: 'status', title: '状态', width:80, align:'center'}
+            ,{field: 'option', title: '操作', width: 80, align:'center', templet: '.optionbtn'}
+            ]]
+            ,page: true //开启分页
+            ,parseData: function(res){ //将原始数据解析成 table 组件所规定的数据，res为从url中get到的数据
+                var result;
+                if(this.page.curr){
+                result = res.data.slice(this.limit*(this.page.curr-1),this.limit*this.page.curr);
+                }
+                else{
+                result=res.data.slice(0,this.limit);
+                }
+                return {
+                "code": res.code, //解析接口状态
+                "msg": res.msg, //解析提示文本
+                "count": res.count, //解析数据长度
+                "data": result //解析数据列表
+                };
+            }
+            //必须等表格渲染完成后才能绑定事件
+            ,done:function (res){
+                //为内嵌按钮绑定事件
+                $(".detailbtn").click(function(e) {
+                    var title = e.target.parentNode.parentNode.parentNode.childNodes[1].childNodes[0].innerText;
+                    layer.open({
+                        type: 2,
+                        title: '投票详情',
+                        area: ['500px', '350px'],
+                        fixed: false, //不固定
+                        maxmin: true,
+                        content: '{{ url_for('auth.voteresult',title='') }}' + title
+                    });
+                })
+            }//end of done
+        });//end of table.render
+    });//end of layui.use
+
+    $("#sub").click(function (){
+        $("#votelayer").hide()
+    })
+
+    $("#search").on('click',function (){
+        var form = new FormData(document.getElementById("searchform"))
+        console.log(form.getAll('key'))
+        $.ajax({
+            url: "{{ url_for('auth.api_user_searchvote') }}",
+            type: "post",
+            data: form,
+            processData: false,
+            contentType: false,
+            success:function (data){
+                console.log(data)
+                layui.use('table', function(){
+                    var table = layui.table;
+                    <!-- 表格渲染 -->
+                    table.render({
+                        elem: '#votelist'
+                        ,height: 500
+                        ,data: data.data
+                        ,loading: true
+                        ,cols: [[ //表头
+                        {field: 'sno', title: '序号', width:50, align: 'center'}
+                        ,{field: 'title', title: '主题', width:180, align:'center'}
+                        ,{field: 'content', title: '内容', width:180, align:'center'}
+                        ,{field: 'choices', title: '选项', width:180,  align:'center'}
+                        ,{field: 'total', title: '所有选项', width:90, align:'center'}
+                        ,{field: 'max', title: '可选选项', width:90, align:'center'}
+                        ,{field: 'start_time', title: '发起时间', width:160, align:'center'}
+                        ,{field: 'end_time', title: '截止时间', width:160, align:'center'}
+                        ,{field: 'status', title: '状态', width:80, align:'center'}
+                        ,{field: 'option', title: '操作', width: 80, align:'center', templet: '.optionbtn'}
+                        ]]
+                        ,page: true //开启分页
+                        ,parseData: function(res){ //将原始数据解析成 table 组件所规定的数据，res为从url中get到的数据
+                            var result;
+                            if(this.page.curr){
+                            result = res.data.slice(this.limit*(this.page.curr-1),this.limit*this.page.curr);
+                            }
+                            else{
+                            result=res.data.slice(0,this.limit);
+                            }
+                            return {
+                            "code": res.code, //解析接口状态
+                            "msg": res.msg, //解析提示文本
+                            "count": res.count, //解析数据长度
+                            "data": result //解析数据列表
+                            };
+                        }
+                        //必须等表格渲染完成后才能绑定事件
+                        ,done:function (res){
+                            //为内嵌按钮绑定事件
+                            $(".detailbtn").click(function(e) {
+                                var title = e.target.parentNode.parentNode.parentNode.childNodes[1].childNodes[0].innerText;
+                                layer.open({
+                                    type: 2,
+                                    title: '投票详情',
+                                    area: ['500px', '350px'],
+                                    fixed: false, //不固定
+                                    maxmin: true,
+                                    content: '{{ url_for('auth.voteresult',title='') }}' + title
+                                });
+                            })
+                        }//end of done
+                    });//end of table.render
+                });//end of layui.use
+            }
+        })
+    })
+</script>
+{% endblock %}

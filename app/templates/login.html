@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>网上投票管理系统，欢迎登陆</title>
+    <link rel="icon" href="{{ url_for('static',filename='img/favicon.ico') }}" type="image/x-icon">
+    <link rel="stylesheet" href="{{ url_for('static',filename='layui/css/layui.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static',filename='style.css') }}">
+    <script type="text/javascript" src="{{ url_for('static',filename='layui/layui.js') }}"></script>
+</head>
+<body style="background-image: url('../static/img/bg.jpg');background-size: 100%">
+    <div class="layui-container" >
+        <div class="login-main">
+            <header class="layui-elip">网上投票管理系统</header>
+            <form class="layui-form" method="post">
+                {{ form.csrf_token}}
+                <div class="layui-form-item">
+                    <div class="layui-input-block">
+                        {{ form.username(class="layui-input",placeholder="用户名",autocomplete="on") }}
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-input-block">
+                        {{ form.password(class="layui-input",placeholder="密码",autocomplete="on") }}
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-input-block">
+                        {{ form.submit(class="layui-btn") }}
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-input-block">
+                        <input type="radio" name="usertype" value="0" title="管理员" checked="">
+                        <input type="radio" name="usertype" value="1" title="用户">
+                    </div>
+                </div>
+                <hr/>
+                <a href="{{ url_for('main.register') }}" class="login-footer">立即注册</a>
+                <a href="javascript:;" class="login-footer">忘记密码？</a>
+            </form>
+        </div>
+    </div>
+
+    <script src="../static/layui/layui.js"></script>
+    <script>
+        layui.use(['layer','form'], function(){
+            var layer = layui.layer
+            // 后端验证，弹出验证消息
+            {% for message in get_flashed_messages() %}
+                layer.msg('{{ message }}');
+            {% endfor %}
+        });
+    </script>
+</body>
+</html>

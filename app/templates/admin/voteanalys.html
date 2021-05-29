@@ -1,0 +1,226 @@
+{% extends "admin/base.html" %}
+
+{% block card_header %}
+    投票分析
+{% endblock %}
+
+{% block card_body %}
+    <!-- 下拉列表区域 -->
+    <form class="layui-form" method="post" id="searchform">
+        <div class="layui-row">
+            <div class="layui-row  layui-col-md6">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">投票主题：</label>
+                    <div class="layui-input-block">
+                        {{ form.titles(id="titles") }}
+                    </div>
+                </div>
+            </div>
+            <div class="layui-row  layui-col-md6">
+                <button type="submit" name="submit" class="layui-btn" lay-submit lay-filter="formDemo">
+                    <i class="layui-icon layui-icon-theme" id="search"></i>
+                </button>
+            </div>
+        </div>
+    </form>
+    <!-- 图表区域 -->
+    <div class="layui-tab">
+        <ul class="layui-tab-title">
+            <li class="layui-this">投票标签百分比</li>
+            <li>投票男女比例</li>
+            <li>各选项投票涨势</li>
+            <li>投票人口省市分布</li>
+        </ul>
+        <div class="layui-tab-content">
+            <div class="layui-tab-item layui-show" id="circular" style="width: 1240px;height:500px;"></div>
+            <div class="layui-tab-item " id="pie" style="width: 1240px;height:500px;"></div>
+            <div class="layui-tab-item " id="line" style="width: 1240px;height:500px;"></div>
+            <div class="layui-tab-item " id="map" style="width: 1240px;height:500px;"></div>
+        </div>
+    </div>
+
+{% endblock %}
+
+
+{% block script %}
+
+<script>
+    layui.use('layer',function (){
+        var layer = layui.layer;
+        {% for message in get_flashed_messages() %}
+            layer.msg('{{ message }}');
+        {% endfor %}
+    })
+    layui.use('form',function (){
+        var form = layui.form;
+    })
+</script>
+
+<script src="{{ url_for('static',filename='/echart/echarts.js') }}"></script>
+
+<script type="text/javascript">
+    var vote_id = {{ vote_id }}
+    var myChart1 = echarts.init(document.getElementById('circular'));
+    var option1;
+    option1 = {
+        title: {
+            text: '投票标签百分比',
+            left: 'center'
+        },
+        xAxis: {
+            type: 'category',
+            data: []
+        },
+        yAxis: {
+            type: 'value'
+        },
+        series: [{
+            data: [],
+            type: 'bar'
+        }]
+    };
+
+    $.post('{{ url_for('auth.api_votechoice_record') }}',{vote_id: vote_id},function (data){
+        // 填入数据
+        console.log(data);
+        option1.xAxis.data = data.choices;
+        option1.series[0].data = data.records;
+        myChart1.setOption(option1);
+    });
+</script>
+
+<script type="text/javascript">
+    var vote_id = {{ vote_id }}
+    var myChart2 = echarts.init(document.getElementById('pie'));
+    var option2;
+    option2 = {
+        title: {
+            text: '参与投票的男女比例',
+            left: 'center'
+        },
+        tooltip: {
+            trigger: 'item'
+        },
+        legend: {
+            orient: 'vertical',
+            left: 'left',
+        },
+        series: [
+            {
+                name: '访问来源',
+                type: 'pie',
+                radius: '50%',
+                data: [
+                    {value: 0, name: '女'},
+                    {value: 0, name: '男'}
+                ],
+                emphasis: {
+                    itemStyle: {
+                        shadowBlur: 10,
+                        shadowOffsetX: 0,
+                        shadowColor: 'rgba(0, 0, 0, 0.5)'
+                    }
+                }
+            }
+        ]
+    };
+    $.post('{{ url_for('auth.api_votegender_record') }}',{vote_id: vote_id},function (data){
+        // 填入数据
+        console.log(data);
+        option2.series[0].data[0].value = data.gender[0];
+        option2.series[0].data[1].value = data.gender[1];
+        myChart2.setOption(option2);
+    });
+
+</script>
+
+<script type="text/javascript">
+    var vote_id = {{ vote_id }}
+    var myChart3 = echarts.init(document.getElementById('line'));
+    var option3;
+    option3 = {
+        title: {
+            text: '各选项票数涨势',
+        },
+        tooltip: {
+            trigger: 'axis'
+        },
+        legend: {
+            data: []
+        },
+        grid: {
+            left: '3%',
+            right: '4%',
+            bottom: '3%',
+            containLabel: true
+        },
+        xAxis: {
+            type: 'category',
+            boundaryGap: false,
+            data: []
+        },
+        yAxis: {
+            type: 'value'
+        },
+        series: [
+        ]
+    };
+    $.post('{{ url_for('auth.api_votegrow_record') }}',{vote_id: vote_id},function (data){
+        // 填入数据
+        console.log(data);
+        option3.legend.data = data.choices_name;
+        option3.xAxis.data = data.date;
+        for(var i=0; i<data.choices.length; i++)
+        {
+            option3.series[i] = {'name': data.choices_name[i],'type':'line','stack':'总量','data': data.count[i]};
+        }
+        console.log(option3.series);
+        myChart3.setOption(option3);
+    });
+
+</script>
+
+<script type="text/javascript">
+    var vote_id = {{ vote_id }}
+    var myChart4 = echarts.init(document.getElementById('map'));
+    var option4;
+
+    option4 = {
+        title: {
+            text: '投票人口省市分布'
+        },
+        legend: {
+            data: ['参与投票人口数量']
+        },
+        radar: {
+            // shape: 'circle',
+            indicator: [
+                { name: 'null', max: 0}
+            ]
+        },
+        series: [{
+            name: '参与投票人口数量',
+            type: 'radar',
+            data: [
+                {
+                    value: [],
+                    name: '参与投票人口数量'
+                }
+            ]
+        }]
+    };
+
+    myChart4.setOption(option4);
+    $.post('{{ url_for('auth.api_votemap_record') }}',{vote_id: vote_id},function (data){
+        // 填入数据
+        console.log(data);
+        option4.series[0].data[0].value = data.count;
+        for(var i=0; i<data.provinces.length; i++)
+        {
+            option4.radar.indicator[i] = { name: data.provinces[i], max: data.total_count };
+        }
+        myChart4.setOption(option4);
+    });
+
+</script>
+{% endblock %}

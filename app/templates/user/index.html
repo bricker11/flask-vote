@@ -1,0 +1,23 @@
+{% extends "user/base.html" %}
+
+{% block card_body %}
+    <div style="text-align: center">
+        <h2 style="font-size: 26px">欢迎使用网上投票管理系统</h2>
+        <img src="{{ url_for('static',filename='img/index.jpg') }}" style="width: 55%; height: 55%; margin-bottom: 20px">
+        <p>
+            <a class="layui-btn layui-btn-normal" href="{{ url_for('auth.votelist') }}">去投票</a>
+        </p>
+    </div>
+{% endblock %}
+
+
+{% block script %}
+<script>
+    layui.use('layer',function (){
+        var layer = layui.layer;
+        {% for message in get_flashed_messages() %}
+            layer.msg('{{ message }}');
+        {% endfor %}
+    })
+</script>
+{% endblock %}

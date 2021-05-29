@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>网上投票管理系统</title>
+    <link rel="icon" href="{{ url_for('static',filename='img/favicon.ico') }}" type="image/x-icon">
+    <link rel="stylesheet" href="{{ url_for('static',filename='layui/css/layui.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static',filename='style.css') }}">
+    <script type="text/javascript" src="{{ url_for('static',filename='layui/layui.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static',filename='echart/echarts.js') }}"></script>
+</head>
+<body>
+    <div class="add-vote" style="margin: 10px 50px">
+        <p class="layui-text">
+            投票：{{ title }} {% if status == 1 %}<span style="color: red">[已截止]</span>{% endif %}
+        </p>
+        <p class="layui-code" style="height: 100px; overflow: auto;">
+            <span class="run">{{ content }}</span>
+        </p>
+        <p>投票选项：</p>
+        <p>
+            {% for choice in choices %}
+                <p><i class="layui-icon layui-icon-star"></i>{{ choice }}</p>
+            {% endfor %}
+        </p>
+        <p style="margin-top: 10px">我的选项：</p>
+        <p>
+            {% for choice in mychoices %}
+                <p><i class="layui-icon layui-icon-star-fill"></i>{{ choice }}</p>
+            {% endfor %}
+        </p>
+    </div>
+
+    <script src="{{ url_for('static',filename='layui/layui.js') }}"></script>
+    <script src="{{ url_for('static',filename='jquery/jquery.min.js') }}"></script>
+    <script>
+        layui.use('layer',function (){
+            var layer = layui.layer;
+            {% for message in get_flashed_messages() %}
+                layer.msg('{{ message }}');
+            {% endfor %}
+        })
+
+        layui.use('form',function (){
+            var form = layui.form;
+        })
+
+    </script>
+</body>
+

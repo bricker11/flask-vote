@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>网上投票管理系统</title>
+    <link rel="icon" href="{{ url_for('static',filename='img/favicon.ico') }}" type="image/x-icon">
+    <link rel="stylesheet" href="{{ url_for('static',filename='layui/css/layui.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static',filename='style.css') }}">
+    <script type="text/javascript" src="{{ url_for('static',filename='layui/layui.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static',filename='echart/echarts.js') }}"></script>
+</head>
+<body>
+    <div class="add-vote" style="margin: 10px 50px">
+        <p class="layui-text">
+            投票：{{ title }}
+        </p>
+        <p class="layui-code" style="height: 100px; overflow: auto;">
+            <span class="run">{{ content }}</span>
+        </p>
+        <p class="layui-text">
+            提示：最多选择{{ max_choice }}个选项
+        </p>
+        <form class="layui-form" method="post">
+            <div class="layui-form-item">
+                <div class="layui-input-inline">
+                    {% if max_choice == 1 %}
+                        {% for i in range(total_choice) %}
+                            {% if i == 0 %}
+                                <input type="radio" id="schoice" name="schoice" value="{{ i + 1 }}" title="{{ choices[i] }}" checked="">
+                            {% else %}
+                                <input type="radio" id="schoice" name="schoice" value="{{ i + 1 }}" title="{{ choices[i] }}">
+                            {% endif %}
+                        {% endfor %}
+                    {% else %}
+                        {% for i in range(total_choice) %}
+                            <input type="checkbox" id="mchoice" name="mchoice{{ i + 1 }}" lay-skin="primary" title="{{ choices[i] }}" >
+                        {% endfor %}
+                    {% endif %}
+                </div>
+            </div>
+            <div class="layui-input-inline">
+                <input class="layui-btn layui-btn-normal" type="submit" name="submit" value="投票" id="dovote" style="margin: 0 160px">
+            </div>
+        </form>
+    </div>
+
+    <script src="{{ url_for('static',filename='layui/layui.js') }}"></script>
+    <script src="{{ url_for('static',filename='jquery/jquery.min.js') }}"></script>
+    <script>
+        layui.use('layer',function (){
+            var layer = layui.layer;
+            {% for message in get_flashed_messages() %}
+                layer.msg('{{ message }}');
+            {% endfor %}
+        })
+
+        layui.use('form',function (){
+            var form = layui.form;
+        })
+
+    </script>
+</body>
+

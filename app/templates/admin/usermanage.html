@@ -1,0 +1,270 @@
+{% extends "admin/base.html" %}
+
+{% block card_header %}
+    账号管理
+{% endblock %}
+
+{% block card_body %}
+    <!-- 搜索区域 -->
+    <div class="layui-row">
+        <div class="layui-row layui-col-md6">
+            <form class="layui-form" method="post" id="searchform">
+                <div class="layui-row">
+                <div class="layui-row layui-col-md6">
+                    <label class="layui-form-label">筛选条件：</label>
+                    <div class="layui-input-block">
+                        {{ form.option }}
+                    </div>
+                </div>
+
+                <div class="layui-row layui-col-md6">
+                    <label class="layui-form-label">关键词：</label>
+                    <div class="layui-input-block">
+                      {{ form.key(class="layui-input",placeholder="请输入关键词") }}
+                    </div>
+                </div>
+
+            </div>
+            </form>
+        </div>
+        <div class="layui-row layui-col-md6">
+            <div class="layui-input-block" style="margin-left: 20px">
+              <button class="layui-btn" lay-submit lay-filter="formDemo">
+                  <i class="layui-icon layui-icon-search layuiadmin-button-btn" id="search"></i>
+              </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 数据表格区域 -->
+    <div style="margin-top: 20px">
+        <table id="userlist" lay-filter="userlist"></table>
+    </div>
+
+    <!-- 表格内嵌按钮 -->
+    <div class="optionbtn" hidden>
+        <button type="button" class="layui-btn layui-btn-xs layui-btn-normal editbtn">
+        修改
+        </button>
+        <button type="button" class="layui-btn layui-btn-xs layui-btn-danger deletebtn">
+        删除
+        </button>
+    </div>
+
+{% endblock %}
+
+<!-- 弹出层内容 -->
+{% block outest %}
+    <!-- 弹出层表单 -->
+    <div class="layui-row"  id="editlayer" style="display: none">
+        <form class="layui-form" id="editlayer" method="post" action="{{ url_for('auth.api_admin_edituser2') }}">
+            <div class="layui-form-item" style="margin-top: 20px">
+                <label class="layui-form-label">用户名：</label>
+                <div class="layui-input-inline" id="username">
+
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">密码：</label>
+                <div class="layui-input-inline" id="password">
+
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-input-block" id="sub">
+
+                </div>
+            </div>
+        </form>
+    </div>
+{% endblock %}
+
+
+{% block script %}
+<script>
+    layui.use('layer',function (){
+        var layer = layui.layer;
+        {% for message in get_flashed_messages() %}
+            layer.msg('{{ message }}');
+        {% endfor %}
+    })
+
+    layui.use('table', function(){
+        var table = layui.table;
+        <!-- 表格渲染 -->
+        table.render({
+            elem: '#userlist'
+            ,height: 500
+            ,url: '{{ url_for('auth.api_admin_usermanage') }}' //数据接口
+            ,loading: true
+            ,cols: [[ //表头
+            {field: 'sno', title: '序号', width:60, align: 'center'}
+            ,{field: 'username', title: '用户名', width:200, align:'center'}
+            ,{field: 'password', title: '密码', width:200, align:'center'}
+            ,{field: 'usertype', title: '用户类型', width:100,  align:'center'}
+            ,{field: 'date', title: '注册时间', width:300, align:'center'}
+            ,{field: 'option', title: '操作', width: 160, align:'center', templet: '.optionbtn'}
+            ]]
+            ,page: true //开启分页
+            ,parseData: function(res){ //将原始数据解析成 table 组件所规定的数据，res为从url中get到的数据
+                var result;
+                if(this.page.curr){
+                result = res.data.slice(this.limit*(this.page.curr-1),this.limit*this.page.curr);
+                }
+                else{
+                result=res.data.slice(0,this.limit);
+                }
+                return {
+                "code": res.code, //解析接口状态
+                "msg": res.msg, //解析提示文本
+                "count": res.count, //解析数据长度
+                "data": result //解析数据列表
+                };
+            }
+            //必须等表格渲染完成后才能绑定事件
+            ,done:function (res){
+                //为内嵌按钮绑定事件
+                $(".editbtn").click(function(e) {
+                    var username = e.currentTarget.parentNode.parentNode.parentNode.childNodes[1].innerText
+                    console.log(username)
+                    layui.use('layer',function (){
+                        $.post('{{ url_for('auth.api_admin_edituser') }}', {username:username}, function(str){
+                            console.log(str)
+                            // 动态填充弹出层表单
+                            $(".formedit").empty()
+                            $("#username").append('<input type="text" class="layui-input" name="username" value="' + str.username + '" readonly="readonly">')
+                            $("#password").append('<input type="text" class="layui-input" name="password" value="' + str.password + '">')
+                            $("#sub").append('<input type="submit" class="layui-btn" value="修改" id="editsubmit">')
+
+                            layer.open({
+                                type: 1,
+                                content:$("#editlayer"),
+                                skin: 'layui-layer-molv',
+                                area: '320px',
+                                cancel: function(){
+                                    $("#editlayer").hide()
+                                }
+                            });
+                        });
+                    })
+                })
+
+                $(".deletebtn").click(function(e) {
+                    var username = e.target.parentNode.parentNode.parentNode.childNodes[1].childNodes[0].innerText;
+                    console.log(username);
+                    layer.open({
+                        content: '确认删除？',
+                        yes: function(index, layero){
+                            $.post('{{ url_for('auth.api_admin_deleteuser') }}',{username: username},function (res){
+                                if(res.status == '0')
+                                    location.reload()
+                                else
+                                    layer.msg('无法删除管理员')
+                            })
+                            layer.close(index);
+                        }
+                    });
+                })
+            }//end of done
+        });//end of table.render
+    });//end of layui.use
+
+    $("#sub").click(function (){
+        $("#editlayer").hide()
+    })
+
+    $("#search").on('click',function (){
+        var form = new FormData(document.getElementById("searchform"))
+        console.log(form.getAll('key'))
+        $.ajax({
+            url: "{{ url_for('auth.api_admin_searchuser1') }}",
+            type: "post",
+            data: form,
+            processData: false,
+            contentType: false,
+            success:function (data){
+                console.log(data)
+                layui.use('table', function(){
+                    var table = layui.table;
+                    <!-- 表格渲染 -->
+                    table.render({
+                        elem: '#userlist'
+                        ,height: 500
+                        ,data: data.data
+                        ,loading: true
+                        ,cols: [[ //表头
+                        {field: 'sno', title: '序号', width:60, align: 'center'}
+                        ,{field: 'username', title: '用户名', width:200, align:'center'}
+                        ,{field: 'password', title: '密码', width:200, align:'center'}
+                        ,{field: 'usertype', title: '用户类型', width:100,  align:'center'}
+                        ,{field: 'date', title: '注册时间', width:300, align:'center'}
+                        ,{field: 'option', title: '操作', width: 160, align:'center', templet: '.optionbtn'}
+                        ]]
+                        ,page: true //开启分页
+                        ,parseData: function(res){ //将原始数据解析成 table 组件所规定的数据，res为从url中get到的数据
+                            var result;
+                            if(this.page.curr){
+                            result = res.data.slice(this.limit*(this.page.curr-1),this.limit*this.page.curr);
+                            }
+                            else{
+                            result=res.data.slice(0,this.limit);
+                            }
+                            return {
+                            "code": res.code, //解析接口状态
+                            "msg": res.msg, //解析提示文本
+                            "count": res.count, //解析数据长度
+                            "data": result //解析数据列表
+                            };
+                        }
+                        //必须等表格渲染完成后才能绑定事件
+                        ,done:function (res){
+                            //为内嵌按钮绑定事件
+                            $(".editbtn").click(function(e) {
+                                var username = e.currentTarget.parentNode.parentNode.parentNode.childNodes[1].innerText
+                                console.log(username)
+                                layui.use('layer',function (){
+                                    $.post('{{ url_for('auth.api_admin_edituser') }}', {username:username}, function(str){
+                                        console.log(str)
+                                        // 动态填充弹出层表单
+                                        $(".formedit").empty()
+                                        $("#username").append('<input type="text" class="layui-input" name="username" value="' + str.username + '" readonly="readonly">')
+                                        $("#password").append('<input type="text" class="layui-input" name="password" value="' + str.password + '">')
+                                        $("#sub").append('<input type="submit" class="layui-btn" value="修改" id="editsubmit">')
+
+                                        layer.open({
+                                            type: 1,
+                                            content:$("#editlayer"),
+                                            skin: 'layui-layer-molv',
+                                            area: '320px',
+                                            cancel: function(){
+                                                $("#editlayer").hide()
+                                            }
+                                        });
+                                    });
+                                })
+                            })
+
+                            $(".deletebtn").click(function(e) {
+                                var username = e.target.parentNode.parentNode.parentNode.childNodes[1].childNodes[0].innerText;
+                                console.log(username);
+                                layer.open({
+                                    content: '确认删除？',
+                                    yes: function(index, layero){
+                                        $.post('{{ url_for('auth.api_admin_deleteuser') }}',{username: username},function (res){
+                                            if(res.status == '0')
+                                                location.reload()
+                                            else
+                                                layer.msg('无法删除管理员')
+                                        })
+                                        layer.close(index);
+                                    }
+                                });
+                            })
+                        }//end of done
+                    });//end of table.render
+                });//end of layui.use
+            }
+        })
+    })
+</script>
+{% endblock %}

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>网上投票管理系统，欢迎注册</title>
+    <link rel="icon" href="{{ url_for('static',filename='img/favicon.ico') }}" type="image/x-icon">
+    <link rel="stylesheet" href="{{ url_for('static',filename='layui/css/layui.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static',filename='style.css') }}">
+    <script type="text/javascript" src="{{ url_for('static',filename='layui/layui.js') }}"></script>
+</head>
+<body style="background-image: url('../static/img/bg.jpg');background-size: 100%">
+    <div class="layui-container" >
+        <div class="login-main">
+            <header class="layui-elip">欢迎注册</header>
+            <form class="layui-form" method="post">
+                {{ form.csrf_token}}
+                <div class="layui-form-item">
+                    <div class="layui-input-block">
+                        {{ form.username(class="layui-input",placeholder="用户名",autocomplete="on") }}
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-input-block">
+                        {{ form.password(class="layui-input",placeholder="密码",autocomplete="off") }}
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-input-block">
+                        {{ form.password2(class="layui-input",placeholder="确认密码",autocomplete="off") }}
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-input-block">
+                        {{ form.validcode(class="layui-input",placeholder="验证码",autocomplete="off") }}
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <a href="javascript:;"><img src="" id="vapic"></a>
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-input-block">
+                        {{ form.submit(class="layui-btn") }}
+                    </div>
+                </div>
+                <p style="font-size: 12px">（注册后请至个人中心完善信息）</p>
+                <hr/>
+                <a href="{{ url_for('main.login') }}" class="register-footer">返回登陆</a>
+            </form>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static',filename='layui/layui.js') }}"></script>
+    <script src="{{ url_for('static',filename='jquery/jquery.min.js') }}"></script>
+    <script>
+        layui.use(['layer','form'], function(){
+            var layer = layui.layer
+            // 后端验证，弹出验证消息
+            {% for message in get_flashed_messages() %}
+                layer.msg('{{ message }}');
+            {% endfor %}
+        });
+    </script>
+
+    <script>
+        $.post('{{ url_for('main.api_validate_picture') }}',function (res){
+            console.log(res.url);
+            $("#vapic").attr('src', '{{ url_for('static',filename='') }}' + res.url);
+        })
+        $("#vapic").on('click',function (){
+            $.post('{{ url_for('main.api_validate_picture') }}',function (res){
+                console.log(res.url);
+                $("#vapic").attr('src', '{{ url_for('static',filename='') }}' + res.url);
+            })
+        })
+    </script>
+</body>
+</html>

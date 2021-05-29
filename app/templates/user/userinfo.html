@@ -1,0 +1,78 @@
+{% extends "user/base.html" %}
+
+{% block card_header %}
+    个人中心
+{% endblock %}
+
+{% block card_body %}
+<div class="add-vote">
+    <form class="layui-form" method="post">
+        <!-- 必须添加 form.csrf_token ,否则表单验证不通过 -->
+        {{ form.csrf_token }}
+        <!-- 必须添加 form.csrf_token ,否则表单验证不通过 -->
+        <div class="layui-form-item">
+            <label class="layui-form-label">用户名：</label>
+            <div class="layui-input-inline">
+                {{ form.username(class="layui-input",placeholder="",autocomplete="on",readonly="readonly") }}
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">性别：</label>
+            <div class="layui-input-inline">
+                {{ form.gender }}
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">生日：</label>
+            <div class="layui-input-inline">
+                {{ form.birth(class="layui-input",id="birth") }}
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">省份：</label>
+            <div class="layui-input-inline">
+                {{ form.province }}
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">原密码：</label>
+            <div class="layui-input-inline">
+                {{ form.old_password(class="layui-input",id="enddate") }}
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">新密码：</label>
+            <div class="layui-input-inline">
+                {{ form.new_password(class="layui-input",id="enddate") }}
+            </div>
+        </div>
+        <div class="layui-input-inline add-vote-btn">
+            {{ form.submit(class="layui-btn",id="addsubmit") }}
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+
+{% block script %}
+<script>
+    layui.use('layer',function (){
+        var layer = layui.layer;
+        {% for message in get_flashed_messages() %}
+            layer.msg('{{ message }}');
+        {% endfor %}
+    })
+
+    layui.use('form',function (){
+        var form = layui.form;
+    })
+
+    layui.use('laydate', function(){
+        var laydate = layui.laydate;
+        laydate.render({
+            elem: '#birth', //指定元素
+            type: 'date'
+        });
+    });
+</script>
+{% endblock %}
