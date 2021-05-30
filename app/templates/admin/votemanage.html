@@ -43,6 +43,9 @@
 
     <!-- 表格内嵌按钮 -->
     <div class="optionbtn" hidden>
+        <button type="button" class="layui-btn layui-btn-xs layui-btn-normal editbtn">
+        修改
+        </button>
         <button type="button" class="layui-btn layui-btn-xs layui-btn-danger deletebtn">
         删除
         </button>
@@ -50,6 +53,31 @@
 
 {% endblock %}
 
+<!-- 弹出层内容 -->
+{% block outest %}
+    <!-- 弹出层表单 -->
+    <div class="layui-row"  id="editlayer" style="display: none">
+        <form class="layui-form" id="editlayer" method="post" action="{{ url_for('auth.api_admin_editvote2') }}">
+            <div class="layui-form-item" style="margin-top: 20px">
+                <label class="layui-form-label">主题：</label>
+                <div class="layui-input-inline voteitem" id="title">
+
+                </div>
+            </div>
+            <div class="layui-form-item" style="margin-top: 20px">
+                <label class="layui-form-label">截止日期：</label>
+                <div class="layui-input-inline voteitem" id="endtime">
+
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-input-block voteitem" id="sub">
+
+                </div>
+            </div>
+        </form>
+    </div>
+{% endblock %}
 
 {% block script %}
 <script>
@@ -78,7 +106,7 @@
             ,{field: 'start_time', title: '发起时间', width:160, align:'center'}
             ,{field: 'end_time', title: '截止时间', width:160, align:'center'}
             ,{field: 'status', title: '状态', width:80, align:'center'}
-            ,{field: 'option', title: '操作', width: 80, align:'center', templet: '.optionbtn'}
+            ,{field: 'option', title: '操作', width: 120, align:'center', templet: '.optionbtn'}
             ]]
             ,page: true //开启分页
             ,parseData: function(res){ //将原始数据解析成 table 组件所规定的数据，res为从url中get到的数据
@@ -114,6 +142,38 @@
                             layer.close(index);
                         }
                     });
+                })
+                $(".editbtn").click(function(e) {
+                    var title = e.target.parentNode.parentNode.parentNode.childNodes[1].childNodes[0].innerText;
+                    console.log(title);
+                    layui.use('layer',function (){
+                        $.post('{{ url_for('auth.api_admin_editvote') }}', {title:title}, function(str){
+                            console.log(str)
+                            // 动态填充弹出层表单
+                            $(".voteitem").empty()
+                            $("#title").append('<input type="text" class="layui-input" name="title" value="' + str.title + '" readonly="readonly">')
+                            $("#endtime").append('<input type="text" id="endtimeinput" class="layui-input" name="endtime" value="' + str.end_time + '">')
+                            $("#sub").append('<input type="submit" class="layui-btn" value="修改" id="editsubmit">')
+
+                            layui.use('laydate', function(){
+                                var laydate = layui.laydate;
+                                laydate.render({
+                                    elem: '#endtimeinput',
+                                    type: 'datetime'
+                                });
+                            });
+
+                            layer.open({
+                                type: 1,
+                                content:$("#editlayer"),
+                                skin: 'layui-layer-molv',
+                                area: '320px',
+                                cancel: function(){
+                                    $("#editlayer").hide()
+                                }
+                            });
+                        });
+                    })
                 })
             }//end of done
         });//end of table.render

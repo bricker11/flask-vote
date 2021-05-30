@@ -334,6 +334,33 @@ def api_admin_searchvote():
     }
     return jsonify(result)
 
+# 获取需要修改的用户的信息
+@auth.route('/api/admin/editvote', methods=['GET','POST'])
+def api_admin_editvote():
+    title = request.form['title']
+    vote = Vote.query.filter_by(title=title).first()
+    if vote:
+        result = {"title": vote.title,
+                  "end_time": vote.end_time.strftime("%Y-%m-%d %H:%M:%S")}
+        return jsonify(result)
+
+# 真正完成用户信息修改的api接口
+@auth.route('/api/admin/editvote2', methods=['GET','POST'])
+def api_admin_editvote2():
+    title = request.form['title']
+    end_time = request.form['endtime']
+    try:
+        end_time = datetime.strptime(end_time, '%Y-%m-%d %H:%M:%S')
+        vote = Vote.query.filter_by(title=title).first()
+        vote.end_time = end_time
+        db.session.commit()
+        flash("修改成功")
+        return redirect(url_for('auth.votemanage'))
+    except:
+        flash("截止时间格式不正确")
+        return redirect(url_for('auth.votemanage'))
+
+
 # 删除投票话题的api接口
 @auth.route('/api/admin/deletevote', methods=['GET','POST'])
 def api_admin_deletevote():
@@ -363,9 +390,10 @@ def api_votechoice_record():
     vote_records = VoteRecord.query.filter_by(vote_id=vote_id).all()
     for vote_record in vote_records:
         choice_records[vote_record.result-1] = choice_records[vote_record.result-1] + 1
+    vote_choices = VoteChoice.query.filter_by(vote_id=vote_id).all()
     choices = []
-    for i in range(1,total_choice+1):
-        choices.append(i)
+    for vote_choice in vote_choices:
+        choices.append(vote_choice.choice)
     result = {"choices": choices,
               "records": choice_records}
     return jsonify(result)
