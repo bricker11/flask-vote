@@ -564,13 +564,21 @@ def myvote():
 @login_required
 def voteanalys2():
     form = VoteAnalysForm()
+    votes = Vote.query.all()
+    form_choices = []
+    for vote in votes:
+        if VoteRecord.query.filter(and_(VoteRecord.vote_id==vote.id,VoteRecord.user_id==current_user.id)).all() and vote.end_time < datetime.now():
+            form_choices.append((str(vote.id), vote.title + '（已截止，我已参与）'))
+        elif VoteRecord.query.filter(and_(VoteRecord.vote_id==vote.id,VoteRecord.user_id==current_user.id)).all():
+            form_choices.append((str(vote.id), vote.title+'（我已参与）'))
+        elif vote.end_time < datetime.now():
+            form_choices.append((str(vote.id), vote.title+'（已截止，未参与）'))
+    form.titles.choices = form_choices
     vote_id = session.get('vote_id')
     if vote_id == None:
         vote_id = 1
     if request.method == "POST":
         vote_id = form.titles.data
-        print('投票id',vote_id)
-        print(type(vote_id))
         session['vote_id'] = int(vote_id)
         return redirect(url_for('auth.voteanalys2'))
     form.titles.data = str(vote_id)
