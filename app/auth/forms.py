@@ -62,3 +62,14 @@ class VoteAnalysForm(FlaskForm):
     def __init__(self):
         super(VoteAnalysForm, self).__init__()
         self.titles.choices = [(str(v.id), v.title) for v in Vote.query.order_by('id')]
+
+# # 投票分析选择表单
+# class DataMineForm(FlaskForm):
+#     attribute = SelectField('attribute', validators=[DataRequired()], coerce=str)
+#     label = SelectField('label', validators=[DataRequired()], coerce=str)
+#     submit = SubmitField('生成')
+#
+#     def __init__(self):
+#         super(DataMineForm, self).__init__()
+#         self.attribute.choices = [(str(v.id), v.title) for v in Vote.query.order_by('id')]
+#         self.label.choices = [(str(v.id), v.title) for v in Vote.query.order_by('id')]

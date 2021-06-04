@@ -7,6 +7,8 @@ from app import db
 from app.models import User,Vote,VoteChoice,VoteRecord
 from sqlalchemy import or_,and_
 from datetime import datetime,timedelta
+from app.dctree import saveData,generateDctree
+import time
 
 ########################################## 管理员区 ######################################
 #                                                                                      #
@@ -86,6 +88,61 @@ def voteanalys():
         return redirect(url_for('auth.voteanalys'))
     form.titles.data = str(vote_id)
     return render_template('admin/voteanalys.html', form=form, vote_id=vote_id, username=current_user.username)
+
+# 数据挖掘页
+@auth.route('/admin/datamine', methods=['GET','POST'])
+@login_required
+def datamine():
+    votes = Vote.query.all()
+    attributes = []
+    for vote in votes:
+        attributes.append(vote.title)
+    return render_template('admin/datamine.html', attributes=attributes, username=current_user.username)
+
+# 根据所选属性和标签生成决策树的api
+@auth.route('/api/admin/datamine', methods=['GET','POST'])
+def api_admin_datamine():
+    # 属性和标签的代码值
+    attr_code = request.form['attr'].split(',')[0:-1]
+    label_code = request.form['label'].split(',')[0:-1]
+    attribute = []
+    label = []
+    # 获取属性和标签的文字值
+    for i in range(len(attr_code)):
+        vote = Vote.query.filter_by(id=int(attr_code[i])).first()
+        attribute.append(vote.title)
+    for i in range(len(label_code)):
+        vote = Vote.query.filter_by(id=int(label_code[i])).first()
+        label.append(vote.title)
+    attribute.extend(label)
+    # 所有普通用户数
+    user_num = len(User.query.all()) - 1
+    users = User.query.filter(User.id > 1).all()
+    # 对每一个用户（一行数据的来源），遍历其相关投票结果
+    choices = []
+    for user in users:
+        choice = []
+        for vote_id in attr_code:
+            vote_record = VoteRecord.query.filter(and_(VoteRecord.user_id==user.id,VoteRecord.vote_id==vote_id)).first()
+            vote_result = VoteChoice.query.filter(and_(VoteChoice.vote_id==vote_id,VoteChoice.code==vote_record.result)).first()
+            choice.append(vote_result.choice)
+        for vote_id in label_code:
+            vote_record = VoteRecord.query.filter(and_(VoteRecord.user_id==user.id,VoteRecord.vote_id==vote_id)).first()
+            vote_result = VoteChoice.query.filter(and_(VoteChoice.vote_id==vote_id,VoteChoice.code==vote_record.result)).first()
+            choice.append(vote_result.choice)
+        choices.append(choice)
+    # 结果写入数据表中
+    saveData(attribute,choices)
+    time.sleep(0.2)
+    # 根据表生成决策树
+    generateDctree()
+    #决策树结果图保存的位置
+    url = 'csv/img/dctree.jpg'
+    result = {
+        "status": 0,
+        "url": url,
+    }
+    return jsonify(result)
 
 ################################### api ################################
 # 获取账户管理页的表格数据
@@ -403,11 +460,9 @@ def api_votechoice_record():
 def api_votegender_record():
     vote_id = int(request.form['vote_id'])
     vote_records = VoteRecord.query.filter_by(vote_id=vote_id).group_by(VoteRecord.user_id).all()
-    print(vote_records)
     gender = [0,0]
     for vote_record in vote_records:
         user = User.query.filter_by(id=vote_record.user_id).first()
-        print(user)
         if user.gender == 0:
             gender[0] = gender[0] + 1
         else:
@@ -481,7 +536,6 @@ def api_votemap_record():
         if user.province in provinces:
             for i in range(len(provinces)):
                 if user.province == provinces[i]:
-                    print('ok')
                     count[i] = count[i] + 1
         else:
             provinces.append(user.province)

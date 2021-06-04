@@ -45,16 +45,19 @@
                         <a href="{{ url_for("auth.usermanage") }}">&nbsp&nbsp&nbsp&nbsp&nbsp<i class="layui-icon layui-icon-user"></i>&nbsp账号管理</a>
                     </li>
                     <li class="layui-nav-item">
-                        <a href="{{ url_for("auth.infomanage") }}">&nbsp&nbsp&nbsp&nbsp&nbsp<i class="layui-icon layui-icon-list"></i>&nbsp信息管理</a>
+                        <a href="{{ url_for("auth.infomanage") }}">&nbsp&nbsp&nbsp&nbsp&nbsp<i class="layui-icon layui-icon-table"></i>&nbsp信息管理</a>
                     </li>
                     <li class="layui-nav-item">
-                        <a href="{{ url_for("auth.voteadd") }}">&nbsp&nbsp&nbsp&nbsp&nbsp<i class="layui-icon layui-icon-list"></i>&nbsp发布投票</a>
+                        <a href="{{ url_for("auth.voteadd") }}">&nbsp&nbsp&nbsp&nbsp&nbsp<i class="layui-icon layui-icon-component"></i>&nbsp发布投票</a>
                     </li>
                     <li class="layui-nav-item">
                         <a href="{{ url_for("auth.votemanage") }}">&nbsp&nbsp&nbsp&nbsp&nbsp<i class="layui-icon layui-icon-list"></i>&nbsp投票列表</a>
                     </li>
                     <li class="layui-nav-item">
                         <a href="{{ url_for("auth.voteanalys") }}">&nbsp&nbsp&nbsp&nbsp&nbsp<i class="layui-icon layui-icon-chart"></i>&nbsp投票分析</a>
+                    </li>
+                    <li class="layui-nav-item">
+                        <a href="{{ url_for("auth.datamine") }}">&nbsp&nbsp&nbsp&nbsp&nbsp<i class="layui-icon layui-icon-engine"></i>&nbsp数据挖掘</a>
                     </li>
                 </ul>
             </div>
@@ -77,7 +80,7 @@
         </div>
     </div>
 
-    <script src="{{ url_for('static',filename='layui/layui.all.js') }}"></script>
+    <script src="{{ url_for('static',filename='layui/layui.js') }}"></script>
     <script src="{{ url_for('static',filename='jquery/jquery.min.js') }}"></script>
 
     <script>

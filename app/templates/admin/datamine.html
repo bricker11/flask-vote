@@ -1,0 +1,104 @@
+{% extends "admin/base.html" %}
+
+{% block card_header %}
+    数据挖掘-决策树
+{% endblock %}
+
+{% block card_body %}
+    <!-- 下拉列表区域 -->
+    <form class="layui-form" method="post" action="javascript:;" id="searchform">
+        <div class="layui-row">
+            <div class="layui-row  layui-col-md5">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">属性：</label>
+                    <div class="layui-input-block">
+                        <select name="city" lay-filter="attrsel">
+                            <option value=""></option>
+                            {% for i in range(attributes|length) %}
+                                <option value="{{ i + 1 }}">{{ attributes[i] }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-row  layui-col-md5">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">标签：</label>
+                    <div class="layui-input-block">
+                        <select name="city" lay-filter="labelsel">
+                            <option value=""></option>
+                            {% for i in range(attributes|length) %}
+                                <option value="{{ i + 1 }}">{{ attributes[i] }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-row  layui-col-md2">
+                <button type="submit" name="submit" class="layui-btn" style="margin-left: 20px;">
+                    <i class="layui-icon layui-icon-set" id="generate"></i>
+                </button>
+            </div>
+        </div>
+    </form>
+    <!-- 所选属性标签区域 -->
+    <div class="layui-row">
+        <div class="layui-row layui-col-md5" style="height: 100px; overflow: auto; border: 1px dashed #b2b2b2" id="attrzone">
+
+        </div>
+        <div class="layui-row layui-col-md5 layui-col-md-offset1" style="height: 100px; overflow: auto; border: 1px dashed #b2b2b2" id="labelzone">
+
+        </div>
+    </div>
+    <!-- 图表区域 -->
+    <div style="width:100%; text-align: center">
+        <img src="{{ url_for('static',filename='csv/img/default.jpg') }}" alt="决策树" id="picture">
+    </div>
+
+{% endblock %}
+
+
+{% block script %}
+
+<script>
+
+    layui.use('layer',function (){
+        var layer = layui.layer;
+        {% for message in get_flashed_messages() %}
+            layer.msg('{{ message }}');
+        {% endfor %}
+    })
+
+    var attr = '';
+    var label = '';
+
+    layui.use('form',function (){
+        var form = layui.form;
+        form.on('select(attrsel)', function(data){
+            // console.log(data)
+            // console.log(data.elem)
+            // console.log(data.value)
+            $("#attrzone").append('<p style="padding-left: 20px">' + data.elem[data.value].innerText + '</p>')
+            attr = attr + data.value.toString() + ','
+        })
+        form.on('select(labelsel)', function(data){
+            console.log(data)
+            console.log(data.elem)
+            console.log(data.value)
+            $("#labelzone").append('<p style="padding-left: 20px">' + data.elem[data.value].innerText + '</p>')
+            label = label + data.value.toString() + ','
+        })
+    })
+
+    $("#generate").on('click',function (){
+        $.post('{{ url_for('auth.api_admin_datamine') }}',{attr:attr,label:label},function (res){
+            console.log(res)
+            var url = {{ url_for('static',filename='') }} + res.url
+            console.log(url)
+            $("#picture").attr('src',url)
+        })
+    })
+</script>
+
+
+{% endblock %}
