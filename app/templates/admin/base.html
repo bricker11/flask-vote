@@ -42,28 +42,28 @@
             <div class="layui-side-scroll" style="background: #333">
                 <ul class="layui-nav layui-nav-tree" style="background: #333">
                     <li class="layui-nav-item">
-                        <a href="{{ url_for("auth.usermanage") }}">&nbsp&nbsp&nbsp&nbsp&nbsp<i class="layui-icon layui-icon-user"></i>&nbsp账号管理</a>
+                        <a id="nav1" href="{{ url_for("auth.usermanage") }}">&nbsp&nbsp&nbsp&nbsp&nbsp<i class="layui-icon layui-icon-user"></i>&nbsp账号管理</a>
                     </li>
                     <li class="layui-nav-item">
-                        <a href="{{ url_for("auth.infomanage") }}">&nbsp&nbsp&nbsp&nbsp&nbsp<i class="layui-icon layui-icon-table"></i>&nbsp信息管理</a>
+                        <a id="nav2" href="{{ url_for("auth.infomanage") }}">&nbsp&nbsp&nbsp&nbsp&nbsp<i class="layui-icon layui-icon-table"></i>&nbsp信息管理</a>
                     </li>
                     <li class="layui-nav-item">
-                        <a href="{{ url_for("auth.voteadd") }}">&nbsp&nbsp&nbsp&nbsp&nbsp<i class="layui-icon layui-icon-component"></i>&nbsp发布投票</a>
+                        <a id="nav3" href="{{ url_for("auth.voteadd") }}">&nbsp&nbsp&nbsp&nbsp&nbsp<i class="layui-icon layui-icon-component"></i>&nbsp发布投票</a>
                     </li>
                     <li class="layui-nav-item">
-                        <a href="{{ url_for("auth.votemanage") }}">&nbsp&nbsp&nbsp&nbsp&nbsp<i class="layui-icon layui-icon-list"></i>&nbsp投票列表</a>
+                        <a id="nav4" href="{{ url_for("auth.votemanage") }}">&nbsp&nbsp&nbsp&nbsp&nbsp<i class="layui-icon layui-icon-list"></i>&nbsp投票列表</a>
                     </li>
                     <li class="layui-nav-item">
-                        <a href="{{ url_for("auth.voteanalys") }}">&nbsp&nbsp&nbsp&nbsp&nbsp<i class="layui-icon layui-icon-chart"></i>&nbsp投票分析</a>
+                        <a id="nav5" href="{{ url_for("auth.voteanalys") }}">&nbsp&nbsp&nbsp&nbsp&nbsp<i class="layui-icon layui-icon-chart"></i>&nbsp投票分析</a>
                     </li>
                     <li class="layui-nav-item">
-                        <a href="{{ url_for("auth.datamine") }}">&nbsp&nbsp&nbsp&nbsp&nbsp<i class="layui-icon layui-icon-engine"></i>&nbsp数据挖掘</a>
+                        <a id="nav6" href="{{ url_for("auth.datamine") }}">&nbsp&nbsp&nbsp&nbsp&nbsp<i class="layui-icon layui-icon-engine"></i>&nbsp数据挖掘</a>
                     </li>
                 </ul>
             </div>
         </div>
         <!-- 主体内容 -->
-        <div class="layui-body">
+        <div class="layui-body" style="overflow-y:auto ">
             <div class="layui-card-header">
                 <h2>{% block card_header %}{% endblock %}</h2>
             </div>
@@ -87,6 +87,11 @@
         layui.use('element',function (){
             var element = layui.element;
         })
+    </script>
+
+    <script>
+        var id = 'nav' + {{ page_id }};
+        $("#"+id).css('color','#28cbd6')
     </script>
 
     {% block script %}

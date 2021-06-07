@@ -42,16 +42,16 @@
             <div class="layui-side-scroll" style="background: #333">
                 <ul class="layui-nav layui-nav-tree" style="background: #333">
                     <li class="layui-nav-item">
-                        <a href="{{ url_for("auth.userinfo") }}">&nbsp&nbsp&nbsp&nbsp&nbsp<i class="layui-icon layui-icon-user"></i>&nbsp个人中心</a>
+                        <a id="nav1" href="{{ url_for("auth.userinfo") }}">&nbsp&nbsp&nbsp&nbsp&nbsp<i class="layui-icon layui-icon-user"></i>&nbsp个人中心</a>
                     </li>
                     <li class="layui-nav-item">
-                        <a href="{{ url_for("auth.votelist") }}">&nbsp&nbsp&nbsp&nbsp&nbsp<i class="layui-icon layui-icon-user"></i>&nbsp投票列表</a>
+                        <a id="nav2" href="{{ url_for("auth.votelist") }}">&nbsp&nbsp&nbsp&nbsp&nbsp<i class="layui-icon layui-icon-user"></i>&nbsp投票列表</a>
                     </li>
                     <li class="layui-nav-item">
-                        <a href="{{ url_for("auth.myvote") }}">&nbsp&nbsp&nbsp&nbsp&nbsp<i class="layui-icon layui-icon-user"></i>&nbsp我的投票</a>
+                        <a id="nav3" href="{{ url_for("auth.myvote") }}">&nbsp&nbsp&nbsp&nbsp&nbsp<i class="layui-icon layui-icon-user"></i>&nbsp我的投票</a>
                     </li>
                     <li class="layui-nav-item">
-                        <a href="{{ url_for("auth.voteanalys2") }}">&nbsp&nbsp&nbsp&nbsp&nbsp<i class="layui-icon layui-icon-chart"></i>&nbsp投票分析</a>
+                        <a id="nav4" href="{{ url_for("auth.voteanalys2") }}">&nbsp&nbsp&nbsp&nbsp&nbsp<i class="layui-icon layui-icon-chart"></i>&nbsp投票分析</a>
                     </li>
                 </ul>
             </div>
@@ -81,6 +81,11 @@
         layui.use('element',function (){
             var element = layui.element;
         })
+    </script>
+
+    <script>
+        var id = 'nav' + {{ page_id }};
+        $("#"+id).css('color','#28cbd6')
     </script>
 
     {% block script %}

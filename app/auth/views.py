@@ -24,14 +24,14 @@ def admin():
 @login_required
 def usermanage():
     form = SearchUserForm1()
-    return render_template('admin/usermanage.html',form=form,username=current_user.username)
+    return render_template('admin/usermanage.html',form=form,username=current_user.username,page_id='1')
 
 # 管理信息页
 @auth.route('/admin/infomanage', methods=['GET','POST'])
 @login_required
 def infomanage():
     form = SearchUserForm()
-    return render_template('admin/infomanage.html',form=form,username=current_user.username)
+    return render_template('admin/infomanage.html',form=form,username=current_user.username,page_id='2')
 
 # 发布投票页
 @auth.route('/admin/voteadd', methods=['GET','POST'])
@@ -65,14 +65,14 @@ def voteadd():
                     i = i + 1
                 flash('发布成功')
         return redirect(url_for('auth.voteadd'))
-    return render_template('admin/voteadd.html',form=form,username=current_user.username)
+    return render_template('admin/voteadd.html',form=form,username=current_user.username,page_id='3')
 
 # 投票管理页
 @auth.route('/admin/votemanage', methods=['GET','POST'])
 @login_required
 def votemanage():
     form = SearchVoteForm()
-    return render_template('admin/votemanage.html',form=form,username=current_user.username)
+    return render_template('admin/votemanage.html',form=form,username=current_user.username,page_id='4')
 
 # 投票分析页
 @auth.route('/admin/voteanalys', methods=['GET','POST'])
@@ -87,7 +87,7 @@ def voteanalys():
         session['vote_id'] = int(vote_id)
         return redirect(url_for('auth.voteanalys'))
     form.titles.data = str(vote_id)
-    return render_template('admin/voteanalys.html', form=form, vote_id=vote_id, username=current_user.username)
+    return render_template('admin/voteanalys.html', form=form, vote_id=vote_id, username=current_user.username,page_id='5')
 
 # 数据挖掘页
 @auth.route('/admin/datamine', methods=['GET','POST'])
@@ -97,7 +97,7 @@ def datamine():
     attributes = []
     for vote in votes:
         attributes.append(vote.title)
-    return render_template('admin/datamine.html', attributes=attributes, username=current_user.username)
+    return render_template('admin/datamine.html', attributes=attributes, username=current_user.username,page_id='6')
 
 # 根据所选属性和标签生成决策树的api
 @auth.route('/api/admin/datamine', methods=['GET','POST'])
@@ -597,21 +597,21 @@ def userinfo():
     if user.birth != None:
         form.birth.data = user.birth.strftime('%Y-%m-%d')
     form.province.data = user.province
-    return render_template('user/userinfo.html',form=form,username=current_user.username)
+    return render_template('user/userinfo.html',form=form,username=current_user.username,page_id='1')
 
-# 所有邮票信息页面
+# 所有投票信息页面
 @auth.route('/user/votelist', methods=['GET','POST'])
 @login_required
 def votelist():
     form = SearchVoteForm()
-    return render_template('user/votelist.html', form=form, username=current_user.username)
+    return render_template('user/votelist.html', form=form, username=current_user.username,page_id='2')
 
 # 我的投票页面
 @auth.route('/user/myvote', methods=['GET','POST'])
 @login_required
 def myvote():
     form = SearchVoteForm()
-    return render_template('user/myvote.html',form=form,username=current_user.username)
+    return render_template('user/myvote.html',form=form,username=current_user.username,page_id='3')
 
 # 投票分析页面
 @auth.route('/user/voteanalys', methods=['GET','POST'])
@@ -636,7 +636,7 @@ def voteanalys2():
         session['vote_id'] = int(vote_id)
         return redirect(url_for('auth.voteanalys2'))
     form.titles.data = str(vote_id)
-    return render_template('user/voteanalys.html', form=form, vote_id=vote_id, username=current_user.username)
+    return render_template('user/voteanalys.html', form=form, vote_id=vote_id, username=current_user.username,page_id='4')
 
 # 投票iframe子页面（点击投票后弹出的页面）
 @auth.route('/user/dovote/<title>', methods=['GET','POST'])

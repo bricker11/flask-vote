@@ -52,8 +52,10 @@
     </div>
     <!-- 图表区域 -->
     <div style="width:100%; text-align: center">
-        <img src="{{ url_for('static',filename='csv/img/default.jpg') }}" alt="决策树" id="picture">
+        <p><img src="{{ url_for('static',filename='csv/img/default.jpg') }}" alt="决策树" id="picture" style="margin-bottom: 5px;"></p>
+        <a id="resultpic" href="{{ url_for('static',filename='csv/img/default.jpg') }}" download="result.jpg" style="font-size: 16px; color:#23a0f1;" >下载结果</a>
     </div>
+
 
 {% endblock %}
 
@@ -96,6 +98,7 @@
             var url = {{ url_for('static',filename='') }} + res.url
             console.log(url)
             $("#picture").attr('src',url)
+            $("#resultpic").attr('href',url)
         })
     })
 </script>
