@@ -298,11 +298,14 @@ def api_admin_searchuser():
             gender = '女'
         else:
             gender = '男'
+        for p in UserInfoForm.provinces:
+            if user.province == p[0]:
+                province = p[1]
         data_row = {'sno': i,
                     'username': user.username,
                     'gender': gender,
                     'birth': user.birth.strftime("%Y-%m-%d"),
-                    'province': user.province,
+                    'province': province,
                     'date': user.date.strftime("%Y-%m-%d %H:%M:%S")}
         data.append(data_row)
     count = len(users)
